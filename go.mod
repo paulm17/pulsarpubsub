@@ -1,4 +1,4 @@
-module pulsarpubsub
+module github.com/paulm17/pulsarpubsub
 
 go 1.22.0
 
@@ -6,8 +6,6 @@ require (
 	github.com/nats-io/nats.go v1.34.0
 	gocloud.dev v0.37.0
 )
-
-replace gocloud.dev/pubsub/natspubsub => github.com/paulm17/pulsarpubsub v0.0.0-20240321125759-5b6f40697479
 
 require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
