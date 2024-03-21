@@ -42,7 +42,7 @@
 //   - Message.BeforeSend: None.
 //   - Message.AfterSend: None.
 //   - Message: *nats.Msg
-package pulsarpubsub // import "gocloud.dev/pubsub/natspubsub"
+package pulsarpubsub // import "github.com/paulm17/pulsarpubsub"
 
 import (
 	"bytes"
