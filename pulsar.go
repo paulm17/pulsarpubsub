@@ -85,7 +85,7 @@ var recvBatcherOpts = &batcher.Options{
 }
 
 func init() {
-	fmt.Println("yolo - pulsar init")
+	fmt.Println("pulsar.go - init")
 
 	o := new(defaultDialer)
 	pubsub.DefaultURLMux().RegisterTopic(Scheme, o)
@@ -101,6 +101,7 @@ type defaultDialer struct {
 }
 
 func (o *defaultDialer) defaultConn(ctx context.Context) (*URLOpener, error) {
+	fmt.Println("pulsar.go - defaultDialer - defaultConn")
 	o.init.Do(func() {
 		serverURL := os.Getenv("NATS_SERVER_URL")
 		fmt.Println("0", serverURL)
