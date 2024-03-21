@@ -1,4 +1,4 @@
-module github.com/paulm17/pulsarpubsub
+module pulsarpubsub
 
 go 1.22.0
 
