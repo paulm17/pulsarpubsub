@@ -333,6 +333,9 @@ func openSubscription(nc *nats.Conn, subject string, opts *SubscriptionOptions) 
 	fmt.Println("pulsar.go - openSubscription")
 	var sub *nats.Subscription
 	var err error
+
+	fmt.Println("pulsar.go - openSubscription - opts", opts)
+
 	if opts != nil && opts.Queue != "" {
 		sub, err = nc.QueueSubscribeSync(subject, opts.Queue)
 	} else {
