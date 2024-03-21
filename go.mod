@@ -7,6 +7,8 @@ require (
 	gocloud.dev v0.37.0
 )
 
+replace gocloud.dev/pubsub/natspubsub => github.com/paulm17/pulsarpubsub v0.0.0-20240321125759-5b6f40697479
+
 require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
