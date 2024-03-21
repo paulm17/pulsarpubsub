@@ -122,6 +122,7 @@ func (o *defaultDialer) defaultConn(ctx context.Context) (*URLOpener, error) {
 }
 
 func (o *defaultDialer) OpenTopicURL(ctx context.Context, u *url.URL) (*pubsub.Topic, error) {
+	fmt.Println("pulsar.go - defaultDialer - OpenTopicURL")
 	opener, err := o.defaultConn(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("open topic %v: failed to open default connection: %v", u, err)
@@ -130,6 +131,7 @@ func (o *defaultDialer) OpenTopicURL(ctx context.Context, u *url.URL) (*pubsub.T
 }
 
 func (o *defaultDialer) OpenSubscriptionURL(ctx context.Context, u *url.URL) (*pubsub.Subscription, error) {
+	fmt.Println("pulsar.go - defaultDialer - OpenSubscriptionURL")
 	opener, err := o.defaultConn(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("open subscription %v: failed to open default connection: %v", u, err)
@@ -156,6 +158,7 @@ type URLOpener struct {
 
 // OpenTopicURL opens a pubsub.Topic based on u.
 func (o *URLOpener) OpenTopicURL(ctx context.Context, u *url.URL) (*pubsub.Topic, error) {
+	fmt.Println("pulsar.go - URLOpener - OpenTopicURL")
 	for param := range u.Query() {
 		return nil, fmt.Errorf("open topic %v: invalid query parameter %s", u, param)
 	}
@@ -165,6 +168,7 @@ func (o *URLOpener) OpenTopicURL(ctx context.Context, u *url.URL) (*pubsub.Topic
 
 // OpenSubscriptionURL opens a pubsub.Subscription based on u.
 func (o *URLOpener) OpenSubscriptionURL(ctx context.Context, u *url.URL) (*pubsub.Subscription, error) {
+	fmt.Println("pulsar.go - URLOpener - OpenSubscriptionURL")
 	opts := o.SubscriptionOptions
 	for param, values := range u.Query() {
 		if strings.ToLower(param) == "queue" && values != nil {
@@ -197,6 +201,7 @@ type topic struct {
 // The subject is the NATS Subject; for more info, see
 // https://nats.io/documentation/writing_applications/subjects.
 func OpenTopic(nc *nats.Conn, subject string, _ *TopicOptions) (*pubsub.Topic, error) {
+	fmt.Println("pulsar.go - OpenTopic")
 	dt, err := openTopic(nc, subject)
 	if err != nil {
 		return nil, err
@@ -207,6 +212,7 @@ func OpenTopic(nc *nats.Conn, subject string, _ *TopicOptions) (*pubsub.Topic, e
 // openTopic returns the driver for OpenTopic. This function exists so the test
 // harness can get the driver interface implementation if it needs to.
 func openTopic(nc *nats.Conn, subject string) (driver.Topic, error) {
+	fmt.Println("pulsar.go - openTopic")
 	if nc == nil {
 		return nil, errors.New("natspubsub: nats.Conn is required")
 	}
@@ -215,6 +221,7 @@ func openTopic(nc *nats.Conn, subject string) (driver.Topic, error) {
 
 // SendBatch implements driver.Topic.SendBatch.
 func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
+	fmt.Println("pulsar.go - topic - SendBatch")
 	if t == nil || t.nc == nil {
 		return errNotInitialized
 	}
@@ -256,10 +263,14 @@ func (t *topic) SendBatch(ctx context.Context, msgs []*driver.Message) error {
 }
 
 // IsRetryable implements driver.Topic.IsRetryable.
-func (*topic) IsRetryable(error) bool { return false }
+func (*topic) IsRetryable(error) bool {
+	fmt.Println("pulsar.go - topic - IsRetryable")
+	return false
+}
 
 // As implements driver.Topic.As.
 func (t *topic) As(i interface{}) bool {
+	fmt.Println("pulsar.go - topic - As")
 	c, ok := i.(**nats.Conn)
 	if !ok {
 		return false
@@ -270,11 +281,13 @@ func (t *topic) As(i interface{}) bool {
 
 // ErrorAs implements driver.Topic.ErrorAs
 func (*topic) ErrorAs(error, interface{}) bool {
+	fmt.Println("pulsar.go - topic - ErrorAs")
 	return false
 }
 
 // ErrorCode implements driver.Topic.ErrorCode
 func (*topic) ErrorCode(err error) gcerrors.ErrorCode {
+	fmt.Println("pulsar.go - topic - ErrorCode")
 	switch err {
 	case nil:
 		return gcerrors.OK
@@ -293,7 +306,10 @@ func (*topic) ErrorCode(err error) gcerrors.ErrorCode {
 }
 
 // Close implements driver.Topic.Close.
-func (*topic) Close() error { return nil }
+func (*topic) Close() error {
+	fmt.Println("pulsar.go - topic - Close")
+	return nil
+}
 
 type subscription struct {
 	nc     *nats.Conn
@@ -305,6 +321,7 @@ type subscription struct {
 // The subject is the NATS Subject to subscribe to;
 // for more info, see https://nats.io/documentation/writing_applications/subjects.
 func OpenSubscription(nc *nats.Conn, subject string, opts *SubscriptionOptions) (*pubsub.Subscription, error) {
+	fmt.Println("pulsar.go - OpenSubscription")
 	ds, err := openSubscription(nc, subject, opts)
 	if err != nil {
 		return nil, err
@@ -313,6 +330,7 @@ func OpenSubscription(nc *nats.Conn, subject string, opts *SubscriptionOptions) 
 }
 
 func openSubscription(nc *nats.Conn, subject string, opts *SubscriptionOptions) (driver.Subscription, error) {
+	fmt.Println("pulsar.go - openSubscription")
 	var sub *nats.Subscription
 	var err error
 	if opts != nil && opts.Queue != "" {
@@ -328,6 +346,7 @@ func openSubscription(nc *nats.Conn, subject string, opts *SubscriptionOptions) 
 
 // ReceiveBatch implements driver.ReceiveBatch.
 func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*driver.Message, error) {
+	fmt.Println("pulsar.go - subscription - ReceiveBatch")
 	if s == nil || s.nsub == nil {
 		return nil, nats.ErrBadSubscription
 	}
@@ -350,6 +369,7 @@ func (s *subscription) ReceiveBatch(ctx context.Context, maxMessages int) ([]*dr
 
 // Convert NATS msgs to *driver.Message.
 func decode(msg *nats.Msg) (*driver.Message, error) {
+	fmt.Println("pulsar.go - decode")
 	if msg == nil {
 		return nil, nats.ErrInvalidMsg
 	}
@@ -363,6 +383,7 @@ func decode(msg *nats.Msg) (*driver.Message, error) {
 }
 
 func messageAsFunc(msg *nats.Msg) func(interface{}) bool {
+	fmt.Println("pulsar.go - messageAsFunc")
 	return func(i interface{}) bool {
 		p, ok := i.(**nats.Msg)
 		if !ok {
@@ -375,24 +396,33 @@ func messageAsFunc(msg *nats.Msg) func(interface{}) bool {
 
 // SendAcks implements driver.Subscription.SendAcks.
 func (s *subscription) SendAcks(ctx context.Context, ids []driver.AckID) error {
+	fmt.Println("pulsar.go - subscription - SendAcks")
 	// Ack is a no-op.
 	return nil
 }
 
 // CanNack implements driver.CanNack.
-func (s *subscription) CanNack() bool { return false }
+func (s *subscription) CanNack() bool {
+	fmt.Println("pulsar.go - subscription - CanNack")
+	return false
+}
 
 // SendNacks implements driver.Subscription.SendNacks. It should never be called
 // because we return false for CanNack.
 func (s *subscription) SendNacks(ctx context.Context, ids []driver.AckID) error {
+	fmt.Println("pulsar.go - subscription - SendNacks")
 	panic("unreachable")
 }
 
 // IsRetryable implements driver.Subscription.IsRetryable.
-func (s *subscription) IsRetryable(error) bool { return false }
+func (s *subscription) IsRetryable(error) bool {
+	fmt.Println("pulsar.go - subscription - IsRetryable")
+	return false
+}
 
 // As implements driver.Subscription.As.
 func (s *subscription) As(i interface{}) bool {
+	fmt.Println("pulsar.go - subscription - As")
 	c, ok := i.(**nats.Subscription)
 	if !ok {
 		return false
@@ -403,11 +433,13 @@ func (s *subscription) As(i interface{}) bool {
 
 // ErrorAs implements driver.Subscription.ErrorAs
 func (*subscription) ErrorAs(error, interface{}) bool {
+	fmt.Println("pulsar.go - subscription - ErrorAs")
 	return false
 }
 
 // ErrorCode implements driver.Subscription.ErrorCode
 func (*subscription) ErrorCode(err error) gcerrors.ErrorCode {
+	fmt.Println("pulsar.go - subscription - ErrorCode")
 	switch err {
 	case nil:
 		return gcerrors.OK
@@ -428,9 +460,13 @@ func (*subscription) ErrorCode(err error) gcerrors.ErrorCode {
 }
 
 // Close implements driver.Subscription.Close.
-func (*subscription) Close() error { return nil }
+func (*subscription) Close() error {
+	fmt.Println("pulsar.go - subscription - Close")
+	return nil
+}
 
 func encodeMessage(dm *driver.Message) ([]byte, error) {
+	fmt.Println("pulsar.go - encodeMessage")
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	if len(dm.Metadata) == 0 {
@@ -446,6 +482,7 @@ func encodeMessage(dm *driver.Message) ([]byte, error) {
 }
 
 func decodeMessage(data []byte, dm *driver.Message) error {
+	fmt.Println("pulsar.go - decodeMessage")
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
 	if err := dec.Decode(&dm.Metadata); err != nil {
