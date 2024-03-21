@@ -105,7 +105,7 @@ func (o *defaultDialer) defaultConn(ctx context.Context) (*URLOpener, error) {
 	o.init.Do(func() {
 		serverURL := os.Getenv("NATS_SERVER_URL")
 		fmt.Println("0", serverURL)
-		if serverURL == "" {
+		if serverURL == "nats://127.0.0.1:4222" {
 			fmt.Println("1")
 			o.err = errors.New("NATS_SERVER_URL environment variable not set")
 			return
