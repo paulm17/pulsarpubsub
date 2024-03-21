@@ -103,12 +103,15 @@ type defaultDialer struct {
 func (o *defaultDialer) defaultConn(ctx context.Context) (*URLOpener, error) {
 	o.init.Do(func() {
 		serverURL := os.Getenv("NATS_SERVER_URL")
+		fmt.Println("0", serverURL)
 		if serverURL == "" {
+			fmt.Println("1")
 			o.err = errors.New("NATS_SERVER_URL environment variable not set")
 			return
 		}
 		conn, err := nats.Connect(serverURL)
 		if err != nil {
+			fmt.Println("2")
 			o.err = fmt.Errorf("failed to dial NATS_SERVER_URL %q: %v", serverURL, err)
 			return
 		}
