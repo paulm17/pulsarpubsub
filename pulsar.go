@@ -85,6 +85,8 @@ var recvBatcherOpts = &batcher.Options{
 }
 
 func init() {
+	fmt.Println("yolo - pulsar init")
+
 	o := new(defaultDialer)
 	pubsub.DefaultURLMux().RegisterTopic(Scheme, o)
 	pubsub.DefaultURLMux().RegisterSubscription(Scheme, o)
